@@ -51,10 +51,33 @@ class _DashboardScreenState extends State<DashboardScreen> {
         ),
       ],
     ),
-    Center(
-      child: Text(
-        'List Page',
-        style: TextStyle(fontSize: 23),
+    // List Page: Scrollable with six items
+    SingleChildScrollView(
+      child: Column(
+        children: List.generate(6, (index) {
+          return Padding(
+            padding:
+                const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+            child: Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10.0),
+                color: Colors.grey[300],
+              ),
+              child: ListTile(
+                leading: Container(
+                  width: 50,
+                  height: 50,
+                  color: Colors.grey, // Placeholder for the image
+                ),
+                title: const Text('Lorem ipsum dolor',
+                    style: TextStyle(fontWeight: FontWeight.bold)),
+                subtitle: const Text(
+                  'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt.',
+                ),
+              ),
+            ),
+          );
+        }),
       ),
     ),
     // Updated Settings Page
@@ -129,9 +152,7 @@ class _SettingsButton extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: ElevatedButton(
         onPressed: () {
-          // Add actions for each button here
           if (isLogout) {
-            // Show confirmation dialog before logging out
             _showLogoutConfirmation(context);
           } else {
             print('$label tapped');
@@ -153,20 +174,19 @@ class _SettingsButton extends StatelessWidget {
     );
   }
 
-  // Function to show the logout confirmation dialog
   void _showLogoutConfirmation(BuildContext context) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text('Log out'),
-          content: const Text('Love ko nimo?'),
+          content: const Text('Are you sure you want to log out?'),
           actions: <Widget>[
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop(); // Close the dialog
               },
-              child: const Text('Oo nga murag dili..'),
+              child: const Text('Cancel'),
             ),
             TextButton(
               onPressed: () {
@@ -178,7 +198,7 @@ class _SettingsButton extends StatelessWidget {
                           const SignupScreen()), // Navigate to signup screen
                 );
               },
-              child: const Text('Nge!'),
+              child: const Text('Log Out'),
             ),
           ],
         );
