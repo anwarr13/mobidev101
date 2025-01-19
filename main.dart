@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'signup_screen.dart'; // Import the signup screen
+import 'dashboard.dart'; // Import the dashboard screen
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -30,11 +31,47 @@ class LoginScreenState extends State<LoginScreen> {
   final TextEditingController _passwordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
 
+  // Mock credentials for successful login
+  final String correctEmail = 'anwarrjervis@gmail.com';
+  final String correctPassword = 'password123';
+
+  // Password visibility toggle
+  bool _isPasswordVisible = false;
+
   void _validateAndLogin() {
     if (_formKey.currentState!.validate()) {
-      // Proceed with login logic
-      print("Login successful with email: ${_emailController.text}");
+      // Check if the entered credentials match the correct ones
+      if (_emailController.text == correctEmail &&
+          _passwordController.text == correctPassword) {
+        // Proceed with login and navigate to Dashboard
+        print("Login successful with email: ${_emailController.text}");
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+              builder: (context) =>
+                  DashboardScreen()), // Navigate to the dashboard screen
+        );
+      } else {
+        // Show an error if the credentials are incorrect
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Invalid email or password')),
+        );
+      }
     }
+  }
+
+  // Function to toggle password visibility for 0.5 seconds
+  void _togglePasswordVisibility() {
+    setState(() {
+      _isPasswordVisible = true;
+    });
+
+    // Hide password after 0.5 seconds
+    Future.delayed(const Duration(milliseconds: 5000), () {
+      setState(() {
+        _isPasswordVisible = false;
+      });
+    });
   }
 
   @override
@@ -83,15 +120,23 @@ class LoginScreenState extends State<LoginScreen> {
                     },
                   ),
                   const SizedBox(height: 16),
-                  // Password Field with validation
+                  // Password Field with validation and eye icon
                   TextFormField(
                     controller: _passwordController,
                     decoration: InputDecoration(
                       labelText: 'Password',
                       border: OutlineInputBorder(),
                       prefixIcon: Icon(Icons.lock),
+                      suffixIcon: GestureDetector(
+                        onTap: _togglePasswordVisibility, // Show/hide password
+                        child: Icon(
+                          _isPasswordVisible
+                              ? Icons.visibility
+                              : Icons.visibility_off,
+                        ),
+                      ),
                     ),
-                    obscureText: true,
+                    obscureText: !_isPasswordVisible, // Toggle the visibility
                     validator: (value) {
                       if (value == null || value.isEmpty) {
                         return 'Please enter your password';
@@ -122,7 +167,7 @@ class LoginScreenState extends State<LoginScreen> {
                       const Text("Don't have an account? "),
                       GestureDetector(
                         onTap: () {
-                          // Add navigation to the signup screen
+                          // Navigate to the signup screen
                           Navigator.push(
                             context,
                             MaterialPageRoute(

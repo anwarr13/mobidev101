@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'signup_screen.dart'; // Import the signup screen to navigate after logout
 
 void main() {
   runApp(const MyApp());
@@ -24,11 +25,31 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   // List of widgets for each tab
   static final List<Widget> _pages = <Widget>[
-    Center(
-      child: Text(
-        'Locations Page',
-        style: TextStyle(fontSize: 23),
-      ),
+    Column(
+      children: [
+        const SizedBox(height: 20),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+          child: TextField(
+            decoration: InputDecoration(
+              hintText: 'Search locations...',
+              prefixIcon: Icon(Icons.search),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.all(Radius.circular(25.0)),
+              ),
+              filled: true,
+              fillColor: Colors.grey[200],
+            ),
+          ),
+        ),
+        const SizedBox(height: 20),
+        const Center(
+          child: Text(
+            '', // Locations Page
+            style: TextStyle(fontSize: 23),
+          ),
+        ),
+      ],
     ),
     Center(
       child: Text(
@@ -37,17 +58,22 @@ class _DashboardScreenState extends State<DashboardScreen> {
       ),
     ),
     // Updated Settings Page
-    GridView.count(
-      crossAxisCount: 2,
-      crossAxisSpacing: 10,
-      mainAxisSpacing: 10,
-      padding: const EdgeInsets.all(16),
-      children: [
-        _SettingsBox(label: 'Edit Profile', icon: Icons.edit),
-        _SettingsBox(label: 'Jervis', icon: Icons.person),
-        _SettingsBox(label: 'Pogi', icon: Icons.star),
-        _SettingsBox(label: 'Logout', icon: Icons.logout),
-      ],
+    Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const CircleAvatar(
+            radius: 50,
+            backgroundColor: Colors.grey,
+          ),
+          const SizedBox(height: 20),
+          _SettingsButton(label: 'Edit Profile'),
+          _SettingsButton(label: 'Change Password'),
+          _SettingsButton(label: 'About'),
+          const SizedBox(height: 15),
+          _SettingsButton(label: 'Logout', isLogout: true),
+        ],
+      ),
     ),
   ];
 
@@ -61,7 +87,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Dashboard ni Anwar'),
+        title: const Text('ShatSpot'),
         centerTitle: true,
       ),
       body: _pages[_selectedIndex],
@@ -82,42 +108,81 @@ class _DashboardScreenState extends State<DashboardScreen> {
             label: 'Settings',
           ),
         ],
-      ),
-    );
+      ), // BottomNavigationBar
+    ); // Scaffold
   }
 }
 
-// Reusable box widget
-class _SettingsBox extends StatelessWidget {
+// Reusable button widget for settings
+class _SettingsButton extends StatelessWidget {
   final String label;
-  final IconData icon;
+  final bool isLogout;
 
-  const _SettingsBox({required this.label, required this.icon});
+  const _SettingsButton({
+    required this.label,
+    this.isLogout = false,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-        // Add actions here, e.g., navigate to another screen
-        print('$label tapped');
-      },
-      child: Container(
-        decoration: BoxDecoration(
-          color: Colors.blue,
-          borderRadius: BorderRadius.circular(12),
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: ElevatedButton(
+        onPressed: () {
+          // Add actions for each button here
+          if (isLogout) {
+            // Show confirmation dialog before logging out
+            _showLogoutConfirmation(context);
+          } else {
+            print('$label tapped');
+          }
+        },
+        style: ElevatedButton.styleFrom(
+          backgroundColor: isLogout ? Colors.red : Colors.grey[300],
+          foregroundColor: isLogout ? Colors.white : Colors.black,
+          minimumSize: const Size(200, 50),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(25),
+          ),
         ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(icon, size: 40, color: Colors.white),
-            const SizedBox(height: 8),
-            Text(
-              label,
-              style: const TextStyle(color: Colors.white, fontSize: 16),
-            ),
-          ],
+        child: Text(
+          label,
+          style: const TextStyle(fontSize: 16),
         ),
       ),
+    );
+  }
+
+  // Function to show the logout confirmation dialog
+  void _showLogoutConfirmation(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Log out'),
+          content: const Text('Love ko nimo?'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+              },
+              child: const Text('Oo nga murag dili..'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) =>
+                          const SignupScreen()), // Navigate to signup screen
+                );
+              },
+              child: const Text('Nge!'),
+            ),
+          ],
+        );
+      },
     );
   }
 }

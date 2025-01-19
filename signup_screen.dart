@@ -1,86 +1,54 @@
 import 'package:flutter/material.dart';
+import 'main.dart'; // Import the main file to navigate back to login
 
 class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});
 
   @override
-  SignupScreenState createState() => SignupScreenState();
+  _SignupScreenState createState() => _SignupScreenState();
 }
 
-class SignupScreenState extends State<SignupScreen> {
-  final TextEditingController _nameController = TextEditingController();
-  final TextEditingController _lastnameController = TextEditingController();
+class _SignupScreenState extends State<SignupScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _phoneController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
 
-  void _validateAndSignup() {
+  // Sign up logic (mocked)
+  void _signUp() {
     if (_formKey.currentState!.validate()) {
-      print("Signup successful with:");
-      print("Name: ${_nameController.text}");
-      print("Lastname: ${_lastnameController.text}");
-      print("Email: ${_emailController.text}");
-      print("Phone: ${_phoneController.text}");
+      // Mock a successful sign-up
+      print("Sign up successful with email: ${_emailController.text}");
+
+      // Navigate back to login screen after successful sign-up
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const MyApp()),
+      );
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Sign Up'),
-      ),
       body: Center(
         child: SingleChildScrollView(
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 25.0),
+            padding: const EdgeInsets.symmetric(horizontal: 24.0),
             child: Form(
               key: _formKey,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
+                  const SizedBox(height: 30),
                   const Text(
                     'Create an Account',
                     style: TextStyle(
-                      fontSize: 24,
+                      fontSize: 28,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  const SizedBox(height: 16),
-                  // Name Field
-                  TextFormField(
-                    controller: _nameController,
-                    decoration: InputDecoration(
-                      labelText: 'First Name',
-                      border: OutlineInputBorder(),
-                      prefixIcon: Icon(Icons.person),
-                    ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter your first name';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 16),
-                  // Lastname Field
-                  TextFormField(
-                    controller: _lastnameController,
-                    decoration: InputDecoration(
-                      labelText: 'Last Name',
-                      border: OutlineInputBorder(),
-                      prefixIcon: Icon(Icons.person_outline),
-                    ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter your last name';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 16),
-                  // Email Field
+                  const SizedBox(height: 32),
+                  // Email TextField with validation
                   TextFormField(
                     controller: _emailController,
                     decoration: InputDecoration(
@@ -100,26 +68,7 @@ class SignupScreenState extends State<SignupScreen> {
                     },
                   ),
                   const SizedBox(height: 16),
-                  // Phone Number Field
-                  TextFormField(
-                    controller: _phoneController,
-                    decoration: InputDecoration(
-                      labelText: 'Phone Number',
-                      border: OutlineInputBorder(),
-                      prefixIcon: Icon(Icons.phone),
-                    ),
-                    keyboardType: TextInputType.phone,
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter your phone number';
-                      } else if (!RegExp(r'^\d{11}$').hasMatch(value)) {
-                        return 'Enter a valid 11-digit phone number';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 16),
-                  // Password Field
+                  // Password Field with validation
                   TextFormField(
                     controller: _passwordController,
                     decoration: InputDecoration(
@@ -141,10 +90,41 @@ class SignupScreenState extends State<SignupScreen> {
                   SizedBox(
                     width: 150,
                     child: ElevatedButton(
-                      onPressed: _validateAndSignup,
-                      child: const Text('Sign Up'),
+                      onPressed: _signUp,
+                      style: ElevatedButton.styleFrom(
+                        minimumSize: const Size(0, 40),
+                      ),
+                      child: const Text(
+                        'Sign Up',
+                        style: TextStyle(fontSize: 16),
+                      ),
                     ),
                   ),
+                  const SizedBox(height: 16),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Text("Already have an account? "),
+                      GestureDetector(
+                        onTap: () {
+                          // Navigate back to the login screen
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => const MyApp()),
+                          );
+                        },
+                        child: const Text(
+                          'Log In.',
+                          style: TextStyle(
+                            color: Colors.blue,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 40),
                 ],
               ),
             ),
