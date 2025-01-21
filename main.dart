@@ -1,9 +1,15 @@
 import 'package:flutter/material.dart';
 import 'signup_screen.dart'; // Import the signup screen
+import 'package:firebase_core/firebase_core.dart'; // Import Firebase core
+import 'package:firebase_auth/firebase_auth.dart'; // Import Firebase authentication
 import 'dashboard.dart'; // Import the dashboard screen
+import 'firebase_options.dart'; // Import the Firebase options
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   runApp(const MyApp());
 }
 
@@ -31,46 +37,41 @@ class LoginScreenState extends State<LoginScreen> {
   final TextEditingController _passwordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
 
-  // Mock credentials for successful login
-  final String correctEmail = 'anwarrjervis@gmail.com';
-  final String correctPassword = 'password123';
-
   // Password visibility toggle
   bool _isPasswordVisible = false;
 
-  void _validateAndLogin() {
+  // FirebaseAuth instance
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+
+  void _validateAndLogin() async {
     if (_formKey.currentState!.validate()) {
-      // Check if the entered credentials match the correct ones
-      if (_emailController.text == correctEmail &&
-          _passwordController.text == correctPassword) {
-        // Proceed with login and navigate to Dashboard
+      try {
+        // Sign in with Firebase Authentication
+        await _auth.signInWithEmailAndPassword(
+          email: _emailController.text,
+          password: _passwordController.text,
+        );
+
+        // If login is successful, navigate to Dashboard
         print("Login successful with email: ${_emailController.text}");
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(
-              builder: (context) =>
-                  DashboardScreen()), // Navigate to the dashboard screen
+          MaterialPageRoute(builder: (context) => DashboardScreen()),
         );
-      } else {
-        // Show an error if the credentials are incorrect
+      } on FirebaseAuthException catch (e) {
+        // Show error message if login fails
+        String errorMessage = e.message ?? 'Login failed. Please try again.';
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Invalid email or password')),
+          SnackBar(content: Text(errorMessage)),
         );
       }
     }
   }
 
-  // Function to toggle password visibility for 0.5 seconds
+  // Function to toggle password visibility
   void _togglePasswordVisibility() {
     setState(() {
-      _isPasswordVisible = true;
-    });
-
-    // Hide password after 0.5 seconds
-    Future.delayed(const Duration(milliseconds: 5000), () {
-      setState(() {
-        _isPasswordVisible = false;
-      });
+      _isPasswordVisible = !_isPasswordVisible;
     });
   }
 

@@ -6,7 +6,7 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -16,11 +16,12 @@ class MyApp extends StatelessWidget {
 }
 
 class DashboardScreen extends StatefulWidget {
+  const DashboardScreen({super.key});
   @override
-  _DashboardScreenState createState() => _DashboardScreenState();
+  DashboardScreenState createState() => DashboardScreenState();
 }
 
-class _DashboardScreenState extends State<DashboardScreen> {
+class DashboardScreenState extends State<DashboardScreen> {
   int _selectedIndex = 0;
 
   // List of widgets for each tab
@@ -89,6 +90,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
             radius: 50,
             backgroundColor: Colors.grey,
           ),
+          const SizedBox(height: 5), // Space between picture and name
+          const Text(
+            'Anwarr Jervis', // Replace with the actual name or a variable
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          ),
           const SizedBox(height: 20),
           _SettingsButton(label: 'Edit Profile'),
           _SettingsButton(label: 'Change Password'),
@@ -154,6 +160,12 @@ class _SettingsButton extends StatelessWidget {
         onPressed: () {
           if (isLogout) {
             _showLogoutConfirmation(context);
+          } else if (label == 'About') {
+            // Navigate to the About screen when 'About' is tapped
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const AboutScreen()),
+            );
           } else {
             print('$label tapped');
           }
@@ -203,6 +215,51 @@ class _SettingsButton extends StatelessWidget {
           ],
         );
       },
+    );
+  }
+}
+
+// New About Screen with margin
+class AboutScreen extends StatelessWidget {
+  const AboutScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('About'),
+        centerTitle: true,
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0), // Add padding inside the screen
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            const SizedBox(
+                height: 5), // Adjust space from the top of the screen
+            // Image at the top
+            Container(
+              width: 120, // Set the width of the image
+              height: 120, // Set the height of the image
+              decoration: BoxDecoration(
+                borderRadius:
+                    BorderRadius.circular(60), // Circular border for the image
+                image: const DecorationImage(
+                  image: AssetImage(
+                      'assets/12345.jpg'), // Replace with your image asset path
+                  fit: BoxFit.cover,
+                ),
+              ),
+            ),
+            const SizedBox(height: 20), // Space between image and text
+            const Text(
+              'This is the About page. Here, you can find information about the app developer.',
+              style: TextStyle(fontSize: 18),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

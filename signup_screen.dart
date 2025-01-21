@@ -1,30 +1,99 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart'; // Import material package
+import 'package:firebase_auth/firebase_auth.dart'; // Import FirebaseAuth
+import 'package:cloud_firestore/cloud_firestore.dart'; // Import Firestore
 import 'main.dart'; // Import the main file to navigate back to login
 
 class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});
 
   @override
-  _SignupScreenState createState() => _SignupScreenState();
+  SignupScreenState createState() => SignupScreenState();
 }
 
-class _SignupScreenState extends State<SignupScreen> {
+class SignupScreenState extends State<SignupScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
 
-  // Sign up logic (mocked)
-  void _signUp() {
-    if (_formKey.currentState!.validate()) {
-      // Mock a successful sign-up
-      print("Sign up successful with email: ${_emailController.text}");
+  // Firebase Authentication instance
+  final FirebaseAuth _auth = FirebaseAuth.instance;
 
-      // Navigate back to login screen after successful sign-up
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const MyApp()),
-      );
+  // Firestore instance
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
+  // Function to handle signup
+  Future<void> _signUp() async {
+    if (_formKey.currentState!.validate()) {
+      try {
+        // Create a user in Firebase Authentication
+        UserCredential userCredential =
+            await _auth.createUserWithEmailAndPassword(
+          email: _emailController.text.trim(),
+          password: _passwordController.text.trim(),
+        );
+
+        // Add user data to Firestore
+        await _firestore.collection('users').doc(userCredential.user!.uid).set({
+          'email': _emailController.text.trim(),
+          'createdAt': DateTime.now(),
+          'uid': userCredential.user!.uid,
+        });
+
+        // Show success dialog
+        _showSuccessDialog();
+      } catch (e) {
+        // Show error if signup fails
+        _showErrorDialog(e.toString());
+      }
     }
+  }
+
+  // Function to show success dialog
+  void _showSuccessDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Sign Up Successful'),
+        content: const Text('Your account has been created successfully!'),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop(); // Close the dialog
+
+              // Wait for the dialog to close before navigating to the login screen
+              Future.delayed(const Duration(milliseconds: 300), () {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const MyApp(),
+                  ),
+                );
+              });
+            },
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Function to show error dialog
+  void _showErrorDialog(String errorMessage) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Notice'),
+        content: Text(errorMessage),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop(); // Close the dialog
+            },
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -48,13 +117,12 @@ class _SignupScreenState extends State<SignupScreen> {
                     ),
                   ),
                   const SizedBox(height: 32),
-                  // Email TextField with validation
                   TextFormField(
                     controller: _emailController,
                     decoration: InputDecoration(
                       labelText: 'Email',
                       border: OutlineInputBorder(),
-                      prefixIcon: Icon(Icons.email),
+                      prefixIcon: const Icon(Icons.email),
                     ),
                     keyboardType: TextInputType.emailAddress,
                     validator: (value) {
@@ -68,13 +136,12 @@ class _SignupScreenState extends State<SignupScreen> {
                     },
                   ),
                   const SizedBox(height: 16),
-                  // Password Field with validation
                   TextFormField(
                     controller: _passwordController,
                     decoration: InputDecoration(
                       labelText: 'Password',
                       border: OutlineInputBorder(),
-                      prefixIcon: Icon(Icons.lock),
+                      prefixIcon: const Icon(Icons.lock),
                     ),
                     obscureText: true,
                     validator: (value) {
@@ -107,11 +174,11 @@ class _SignupScreenState extends State<SignupScreen> {
                       const Text("Already have an account? "),
                       GestureDetector(
                         onTap: () {
-                          // Navigate back to the login screen
                           Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => const MyApp()),
+                              builder: (context) => const MyApp(),
+                            ),
                           );
                         },
                         child: const Text(
