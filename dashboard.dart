@@ -1,190 +1,133 @@
 import 'package:flutter/material.dart';
-import 'signup_screen.dart'; // Import the signup screen to navigate after logout
-
-void main() {
-  runApp(const MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-        debugShowCheckedModeBanner: false, home: DashboardScreen());
-  }
-}
+import 'signup_screen.dart';
+import 'editprofilescreen.dart';
+import 'aboutscreen.dart';
 
 class DashboardScreen extends StatefulWidget {
-  const DashboardScreen({super.key});
   @override
   DashboardScreenState createState() => DashboardScreenState();
 }
 
 class DashboardScreenState extends State<DashboardScreen> {
-  int _selectedIndex = 0;
+  int _selectedIndex = 0; // Default to the Locations tab
+  String username = 'Default Username'; // Default username
 
-  // List of widgets for each tab
-  static final List<Widget> _pages = <Widget>[
-    Column(
-      children: [
-        const SizedBox(height: 20),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0),
-          child: TextField(
-            decoration: InputDecoration(
-              hintText: 'Search locations...',
-              prefixIcon: Icon(Icons.search),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.all(Radius.circular(25.0)),
-              ),
-              filled: true,
-              fillColor: Colors.grey[200],
-            ),
-          ),
-        ),
-        const SizedBox(height: 20),
-        const Center(
-          child: Text(
-            '', // Locations Page
-            style: TextStyle(fontSize: 23),
-          ),
-        ),
-      ],
-    ),
-    // List Page: Scrollable with six items
-    SingleChildScrollView(
-      child: Column(
-        children: List.generate(6, (index) {
-          return Padding(
-            padding:
-                const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-            child: Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(10.0),
-                color: Colors.grey[300],
-              ),
-              child: ListTile(
-                leading: Container(
-                  width: 50,
-                  height: 50,
-                  color: Colors.grey, // Placeholder for the image
-                ),
-                title: const Text('Lorem ipsum dolor',
-                    style: TextStyle(fontWeight: FontWeight.bold)),
-                subtitle: const Text(
-                  'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt.',
+  // Getter for pages to dynamically reflect username changes
+  List<Widget> get _pages => <Widget>[
+        // Locations Tab
+        Column(
+          children: [
+            const SizedBox(height: 20),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: TextField(
+                decoration: InputDecoration(
+                  hintText: 'Search locations...',
+                  prefixIcon: const Icon(Icons.search),
+                  border: const OutlineInputBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(25.0)),
+                  ),
+                  filled: true,
+                  fillColor: Colors.grey[200],
                 ),
               ),
             ),
-          );
-        }),
-      ),
-    ),
-    // Updated Settings Page
-    Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          const CircleAvatar(
-            radius: 50,
-            backgroundColor: Colors.grey,
-          ),
-          const SizedBox(height: 5), // Space between picture and name
-          const Text(
-            'Anwarr Jervis', // Replace with the actual name or a variable
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 20),
-          _SettingsButton(label: 'Edit Profile'),
-          _SettingsButton(label: 'Change Password'),
-          _SettingsButton(label: 'About'),
-          const SizedBox(height: 15),
-          _SettingsButton(label: 'Logout', isLogout: true),
-        ],
-      ),
-    ),
-  ];
+            const SizedBox(height: 20),
+            const Center(
+              child: Text(
+                'Locations Page',
+                style: TextStyle(fontSize: 23, fontWeight: FontWeight.bold),
+              ),
+            ),
+          ],
+        ),
 
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('ShatSpot'),
-        centerTitle: true,
-      ),
-      body: _pages[_selectedIndex],
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _selectedIndex,
-        onTap: _onItemTapped,
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.location_on),
-            label: 'Locations',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.list),
-            label: 'List',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.settings),
-            label: 'Settings',
-          ),
-        ],
-      ), // BottomNavigationBar
-    ); // Scaffold
-  }
-}
-
-// Reusable button widget for settings
-class _SettingsButton extends StatelessWidget {
-  final String label;
-  final bool isLogout;
-
-  const _SettingsButton({
-    required this.label,
-    this.isLogout = false,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: ElevatedButton(
-        onPressed: () {
-          if (isLogout) {
-            _showLogoutConfirmation(context);
-          } else if (label == 'About') {
-            // Navigate to the About screen when 'About' is tapped
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const AboutScreen()),
-            );
-          } else {
-            print('$label tapped');
-          }
-        },
-        style: ElevatedButton.styleFrom(
-          backgroundColor: isLogout ? Colors.red : Colors.grey[300],
-          foregroundColor: isLogout ? Colors.white : Colors.black,
-          minimumSize: const Size(200, 50),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(25),
+        // List Tab
+        SingleChildScrollView(
+          child: Column(
+            children: List.generate(6, (index) {
+              return Padding(
+                padding:
+                    const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10.0),
+                    color: Colors.grey[300],
+                  ),
+                  child: ListTile(
+                    leading: Container(
+                      width: 50,
+                      height: 50,
+                      color: Colors.grey, // Placeholder for the image
+                    ),
+                    title: const Text(
+                      'Lorem ipsum dolor',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    subtitle: const Text(
+                      'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+                    ),
+                  ),
+                ),
+              );
+            }),
           ),
         ),
-        child: Text(
-          label,
-          style: const TextStyle(fontSize: 16),
+
+        // Settings Tab
+        Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const CircleAvatar(
+                radius: 50,
+                backgroundColor: Colors.grey,
+              ),
+              const SizedBox(height: 5),
+              Text(
+                username,
+                style:
+                    const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 20),
+              _SettingsButton(
+                label: 'Edit Profile',
+                onTap: () async {
+                  final updatedName = await Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) =>
+                          EditProfileScreen(initialName: username),
+                    ),
+                  );
+                  if (updatedName != null && updatedName is String) {
+                    setState(() {
+                      username = updatedName;
+                    });
+                  }
+                },
+              ),
+              _SettingsButton(label: 'Change Password'),
+              _SettingsButton(
+                label: 'About',
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const AboutScreen()),
+                  );
+                },
+              ),
+              const SizedBox(height: 15),
+              _SettingsButton(
+                label: 'Logout',
+                isLogout: true,
+                onTap: () => _showLogoutConfirmation(context),
+              ),
+            ],
+          ),
         ),
-      ),
-    );
-  }
+      ];
 
   void _showLogoutConfirmation(BuildContext context) {
     showDialog(
@@ -203,12 +146,7 @@ class _SettingsButton extends StatelessWidget {
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop(); // Close the dialog
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) =>
-                          const SignupScreen()), // Navigate to signup screen
-                );
+                _logout();
               },
               child: const Text('Log Out'),
             ),
@@ -217,47 +155,79 @@ class _SettingsButton extends StatelessWidget {
       },
     );
   }
-}
 
-// New About Screen with margin
-class AboutScreen extends StatelessWidget {
-  const AboutScreen({super.key});
+  void _logout() {
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => const SignupScreen()),
+    );
+  }
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('About'),
+        title: const Text('ShatSpot'),
         centerTitle: true,
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0), // Add padding inside the screen
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            const SizedBox(
-                height: 5), // Adjust space from the top of the screen
-            // Image at the top
-            Container(
-              width: 120, // Set the width of the image
-              height: 120, // Set the height of the image
-              decoration: BoxDecoration(
-                borderRadius:
-                    BorderRadius.circular(60), // Circular border for the image
-                image: const DecorationImage(
-                  image: AssetImage(
-                      'assets/12345.jpg'), // Replace with your image asset path
-                  fit: BoxFit.cover,
-                ),
-              ),
-            ),
-            const SizedBox(height: 20), // Space between image and text
-            const Text(
-              'This is the About page. Here, you can find information about the app developer.',
-              style: TextStyle(fontSize: 18),
-              textAlign: TextAlign.center,
-            ),
-          ],
+      body: _pages[_selectedIndex], // Show the selected page
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _selectedIndex, // Reflect the current tab
+        onTap: _onItemTapped,
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.location_on),
+            label: 'Locations',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.list),
+            label: 'List',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.settings),
+            label: 'Settings',
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// Reusable button widget for settings
+class _SettingsButton extends StatelessWidget {
+  final String label;
+  final bool isLogout;
+  final VoidCallback? onTap;
+
+  const _SettingsButton({
+    required this.label,
+    this.isLogout = false,
+    this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: ElevatedButton(
+        onPressed: onTap,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: isLogout ? Colors.red : Colors.grey[300],
+          foregroundColor: isLogout ? Colors.white : Colors.black,
+          minimumSize: const Size(200, 50),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(25),
+          ),
+        ),
+        child: Text(
+          label,
+          style: const TextStyle(fontSize: 16),
         ),
       ),
     );
