@@ -26,46 +26,63 @@ class DashboardScreenState extends State<DashboardScreen> {
   // Getter for pages to dynamically reflect username changes
   List<Widget> get _pages => <Widget>[
         // Locations Tab
-        Column(
+        Stack(
           children: [
-            const SizedBox(height: 15),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: TextField(
-                decoration: InputDecoration(
-                  hintText: 'Search locations...',
-                  prefixIcon: const Icon(Icons.search),
-                  border: const OutlineInputBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(5.0)),
+            GoogleMap(
+              initialCameraPosition: _initialPosition,
+              myLocationButtonEnabled: true,
+              myLocationEnabled: true,
+              zoomControlsEnabled: true,
+              zoomGesturesEnabled: true,
+              onMapCreated: (GoogleMapController controller) {
+                mapController = controller;
+              },
+              markers: {
+                const Marker(
+                  markerId: MarkerId('ipil_center'),
+                  position: _ipilLocation,
+                  infoWindow: InfoWindow(
+                    title: 'Ipil',
+                    snippet: 'Zamboanga Sibugay, Philippines',
                   ),
-                  filled: true,
-                  fillColor: Colors.grey[200],
+                ),
+              },
+            ),
+            // Search bar inside the map
+            Positioned(
+              top: 40,
+              left: 20,
+              right: 20,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 15),
+                height: 50,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(25),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.2),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: Row(
+                  children: [
+                    const Icon(Icons.search, color: Colors.black),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: TextField(
+                        decoration: const InputDecoration(
+                          hintText: 'Search locations...',
+                          border: InputBorder.none,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),
-            const SizedBox(height: 20),
-            Expanded(
-              child: GoogleMap(
-                initialCameraPosition: _initialPosition,
-                myLocationButtonEnabled: true,
-                myLocationEnabled: true,
-                zoomControlsEnabled: true,
-                zoomGesturesEnabled: true,
-                onMapCreated: (GoogleMapController controller) {
-                  mapController = controller;
-                },
-                markers: {
-                  const Marker(
-                    markerId: MarkerId('ipil_center'),
-                    position: _ipilLocation,
-                    infoWindow: InfoWindow(
-                      title: 'Ipil',
-                      snippet: 'Zamboanga Sibugay, Philippines',
-                    ),
-                  ),
-                },
-              ),
-            )
           ],
         ),
 
@@ -199,11 +216,6 @@ class DashboardScreenState extends State<DashboardScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        centerTitle: true,
-        title: const Text('Dashboard'),
-        toolbarHeight: 35.0, // Set the height of the AppBar
-      ),
       body: _pages[_selectedIndex], // Show the selected page
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex, // Reflect the current tab
