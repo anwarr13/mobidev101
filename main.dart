@@ -60,9 +60,15 @@ class LoginScreenState extends State<LoginScreen> {
         );
       } on FirebaseAuthException catch (e) {
         // Show error message if login fails
-        String errorMessage = e.message ?? 'Login failed. Please try again.';
+        String errorMessage;
+        if (e.code == 'user-not-found' || e.code == 'wrong-password') {
+          errorMessage = 'Wrong email or password, Try Again.';
+        } else {
+          errorMessage = e.message ?? 'Login failed. Please try again.';
+        }
+        // Show error message in a SnackBar
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(errorMessage)),
+          SnackBar(content: Text(errorMessage), backgroundColor: Colors.red),
         );
       }
     }
@@ -99,6 +105,7 @@ class LoginScreenState extends State<LoginScreen> {
                   Image.asset(
                     'assets/01.jpg',
                     height: 150,
+                    fit: BoxFit.fill,
                   ),
                   const SizedBox(height: 32),
                   // Email TextField with validation
