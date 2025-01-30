@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'signup_screen.dart';
 import 'editprofilescreen.dart';
 import 'aboutscreen.dart';
@@ -11,13 +12,23 @@ class DashboardScreen extends StatefulWidget {
 class DashboardScreenState extends State<DashboardScreen> {
   int _selectedIndex = 0; // Default to the Locations tab
   String username = 'Default Username'; // Default username
+  GoogleMapController? mapController;
+
+  // Ipil, Zamboanga Sibugay, Philippines
+  static const LatLng _ipilLocation = LatLng(7.7844, 122.5901);
+
+  // Initial camera position for the map
+  static const CameraPosition _initialPosition = CameraPosition(
+    target: _ipilLocation,
+    zoom: 14,
+  );
 
   // Getter for pages to dynamically reflect username changes
   List<Widget> get _pages => <Widget>[
         // Locations Tab
         Column(
           children: [
-            const SizedBox(height: 20),
+            const SizedBox(height: 15),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
               child: TextField(
@@ -25,7 +36,7 @@ class DashboardScreenState extends State<DashboardScreen> {
                   hintText: 'Search locations...',
                   prefixIcon: const Icon(Icons.search),
                   border: const OutlineInputBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(25.0)),
+                    borderRadius: BorderRadius.all(Radius.circular(5.0)),
                   ),
                   filled: true,
                   fillColor: Colors.grey[200],
@@ -33,12 +44,28 @@ class DashboardScreenState extends State<DashboardScreen> {
               ),
             ),
             const SizedBox(height: 20),
-            const Center(
-              child: Text(
-                'Locations Page',
-                style: TextStyle(fontSize: 23, fontWeight: FontWeight.bold),
+            Expanded(
+              child: GoogleMap(
+                initialCameraPosition: _initialPosition,
+                myLocationButtonEnabled: true,
+                myLocationEnabled: true,
+                zoomControlsEnabled: true,
+                zoomGesturesEnabled: true,
+                onMapCreated: (GoogleMapController controller) {
+                  mapController = controller;
+                },
+                markers: {
+                  const Marker(
+                    markerId: MarkerId('ipil_center'),
+                    position: _ipilLocation,
+                    infoWindow: InfoWindow(
+                      title: 'Ipil',
+                      snippet: 'Zamboanga Sibugay, Philippines',
+                    ),
+                  ),
+                },
               ),
-            ),
+            )
           ],
         ),
 
@@ -173,8 +200,9 @@ class DashboardScreenState extends State<DashboardScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('ShatSpot'),
         centerTitle: true,
+        title: const Text('Dashboard'),
+        toolbarHeight: 35.0, // Set the height of the AppBar
       ),
       body: _pages[_selectedIndex], // Show the selected page
       bottomNavigationBar: BottomNavigationBar(
