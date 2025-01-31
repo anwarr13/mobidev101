@@ -26,70 +26,77 @@ class DashboardScreenState extends State<DashboardScreen> {
   // Getter for pages to dynamically reflect username changes
   List<Widget> get _pages => <Widget>[
         // Locations Tab
-        Stack(
-          children: [
-            GoogleMap(
-              initialCameraPosition: _initialPosition,
-              myLocationButtonEnabled: true,
-              myLocationEnabled: true,
-              zoomControlsEnabled: true,
-              zoomGesturesEnabled: true,
-              onMapCreated: (GoogleMapController controller) {
-                mapController = controller;
-              },
-              markers: {
-                const Marker(
-                  markerId: MarkerId('ipil_center'),
-                  position: _ipilLocation,
-                  infoWindow: InfoWindow(
-                    title: 'Ipil',
-                    snippet: 'Zamboanga Sibugay, Philippines',
-                  ),
-                ),
-              },
-            ),
-            // Search bar inside the map
-            Positioned(
-              top: 40,
-              left: 20,
-              right: 20,
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 15),
-                height: 50,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(25),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.2),
-                      blurRadius: 8,
-                      offset: const Offset(0, 2),
+        Builder(
+          builder: (context) => Stack(
+            children: [
+              GoogleMap(
+                initialCameraPosition: _initialPosition,
+                myLocationButtonEnabled: true,
+                myLocationEnabled: true,
+                zoomControlsEnabled: true,
+                zoomGesturesEnabled: true,
+                onMapCreated: (GoogleMapController controller) {
+                  mapController = controller;
+                },
+                markers: {
+                  const Marker(
+                    markerId: MarkerId('ipil_center'),
+                    position: _ipilLocation,
+                    infoWindow: InfoWindow(
+                      title: 'Ipil',
+                      snippet: 'Zamboanga Sibugay, Philippines',
                     ),
-                  ],
-                ),
-                child: Row(
-                  children: [
-                    const Icon(Icons.search, color: Colors.black),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: TextField(
-                        decoration: const InputDecoration(
-                          hintText: 'Search locations...',
-                          border: InputBorder.none,
+                  ),
+                },
+              ),
+              // Search bar inside the map
+              Positioned(
+                top: 40,
+                left: 20,
+                right: 20,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 15),
+                  height: 50,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(25),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.2),
+                        blurRadius: 8,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: Row(
+                    children: [
+                      GestureDetector(
+                        onTap: () {
+                          Scaffold.of(context).openDrawer();
+                        },
+                        child: const Icon(Icons.menu, color: Colors.black),
+                      ),
+                      const SizedBox(width: 10),
+                      const Expanded(
+                        child: TextField(
+                          decoration: InputDecoration(
+                            hintText: 'Search locations...',
+                            border: InputBorder.none,
+                          ),
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
 
         // List Tab
         SingleChildScrollView(
           child: Column(
-            children: List.generate(6, (index) {
+            children: List.generate(10, (index) {
               return Padding(
                 padding:
                     const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
@@ -123,9 +130,9 @@ class DashboardScreenState extends State<DashboardScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const CircleAvatar(
+              CircleAvatar(
                 radius: 50,
-                backgroundColor: Colors.grey,
+                backgroundImage: AssetImage('assets/Profile.jpg'),
               ),
               const SizedBox(height: 5),
               Text(
@@ -216,6 +223,74 @@ class DashboardScreenState extends State<DashboardScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      drawer: _selectedIndex == 0
+          ? Drawer(
+              child: ListView(
+                padding: EdgeInsets.zero,
+                children: <Widget>[
+                  UserAccountsDrawerHeader(
+                    accountName: Text(username),
+                    accountEmail: Text(
+                        'user@example.com'), // Replace with the actual user email
+                    currentAccountPicture: const CircleAvatar(
+                      backgroundImage: AssetImage('assets/Profile.jpg'),
+                    ),
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.edit),
+                    title: const Text('Edit Profile'),
+                    onTap: () async {
+                      final updatedName = await Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              EditProfileScreen(initialName: username),
+                        ),
+                      );
+                      if (updatedName != null && updatedName is String) {
+                        setState(() {
+                          username = updatedName;
+                        });
+                      }
+                      Navigator.pop(context);
+                    },
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.lock),
+                    title: const Text('Change Password'),
+                    onTap: () {
+                      Navigator.pop(context);
+                    },
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.info),
+                    title: const Text('About'),
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const AboutScreen()),
+                      );
+                    },
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.logout),
+                    title: const Text('Logout'),
+                    onTap: () {
+                      Navigator.pop(context);
+                      _showLogoutConfirmation(context);
+                    },
+                  ),
+                ],
+              ),
+            )
+          : null,
+      appBar: _selectedIndex == 1
+          ? AppBar(
+              title: const Text('List of Bars'),
+              centerTitle: true,
+            )
+          : null, // AppBar only on List Tab
       body: _pages[_selectedIndex], // Show the selected page
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex, // Reflect the current tab
@@ -226,13 +301,9 @@ class DashboardScreenState extends State<DashboardScreen> {
             label: 'Locations',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.list),
-            label: 'List',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.settings),
-            label: 'Settings',
-          ),
+            icon: Icon(Icons.explore),
+            label: 'Explore',
+          ), // I remove the Settings Icon but i the functions are inside of the Drawer.
         ],
       ),
     );

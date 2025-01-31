@@ -32,7 +32,12 @@ dependencies:
     sdk: flutter
   firebase_auth: ^5.0.1
   cloud_firestore: ^5.6.1
-
+  google_maps_flutter: ^2.10.0
+  shared_preferences: ^2.5.1
+  flutter_polyline_points: ^2.1.0
+  image_picker: ^1.1.2
+  path_provider: ^2.1.5
+  path: ^1.9.0
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
@@ -54,11 +59,12 @@ dev_dependencies:
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
 
-# The following section is specific to Flutter packages.
+# The following section is specific to Flutter packages. #Where Assets/Images are stored
 flutter:
-  assets:
-      - assets/01.jpg
-      - assets/12345.jpg
+  assets: 
+    - assets/Programmer.jpg
+    - assets/Profile.jpg
+    - assets/login(bg).jpg
 
 
 
